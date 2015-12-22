@@ -1,0 +1,34 @@
+<!doctype html>
+<html ng-app="irulan">
+<head>
+<meta charset="UTF-8">
+<title>Single page web app using Angularjs</title>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-sanitize.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.8/angular-route.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="components.navbar.js"></script>
+<script src="app.js"></script>
+</head>
+<body>
+<navbar title="Irulan">
+  <navlink>Link 1</navlink>
+  <navlink>Link 2</navlink>
+  <search/>
+</navbar>
+<br/>
+
+<dropdown>
+  <dropdownlink>Action</dropdownlink>
+  <dropdownlink>Another Action</dropdownlink>
+  <divider/>
+  <dropdownlink>Action after divider</dropdownlink>
+</dropdown>
+
+<div class="jumbotron"> <p>
+This is place to put content. You can put slider, short description about your website and place some links for navigation.
+</p></div>
+</body>
+</html>
