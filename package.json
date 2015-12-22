@@ -1,0 +1,22 @@
+{
+  "name": "irulan",
+  "version": "1.0.0",
+  "description": "Wiki Engine",
+  "main": "irulan.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShaunMaher/irulan.git"
+  },
+  "author": "Shaun Maher <shaun@ghanima.net>",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/ShaunMaher/irulan/issues"
+  },
+  "homepage": "https://github.com/ShaunMaher/irulan#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
