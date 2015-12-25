@@ -1,4 +1,7 @@
 var express = require("express");
+var fs = require("fs");
+//var url = require("url");
+var path = require("path");
 var app = express();
 var router = express.Router();
 var viewsDir = __dirname + '/views/';
@@ -19,30 +22,34 @@ router.get("/", function (req, res) {
 router.get("/components.navbar.js", function (req, res) {
   res.sendFile(clientJsDir + "components.navbar.js");
 });
+router.get("/components.pages.js", function (req, res) {
+  res.sendFile(clientJsDir + "components.pages.js");
+});
+router.get("/marked.min.js", function (req, res) {
+  res.sendFile(__dirname + '/node_modules/marked/marked.min.js');
+});
 router.get("/app.js", function (req, res) {
   res.sendFile(clientJsDir + "app.js");
 });
+
 // Locally cached resources
-router.get("/cached/bootstrap.min.css", function (req, res) {
-  res.sendFile(cachedCssDir + "bootstrap.min.css");
-});
-router.get("/cached/bootstrap.min.js", function (req, res) {
-  res.sendFile(cachedJsDir + "bootstrap.min.js");
-});
-router.get("/cached/jquery.min.js", function (req, res) {
-  res.sendFile(cachedJsDir + "bootstrap.min.js");
-});
-router.get("/cached/angular.min.js", function (req, res) {
-  res.sendFile(cachedJsDir + "angular.min.js");
-});
-router.get("/cached/angular-sanitize.min.js", function (req, res) {
-  res.sendFile(cachedJsDir + "angular-sanitize.min.js");
-});
-router.get("/cached/angular-route.min.js", function (req, res) {
-  res.sendFile(cachedJsDir + "angular-route.min.js");
-});
+var locallyCachedResources = require("locallyCachedResources");
+locallyCachedResources(cachedJsDir, cachedCssDir);
+router.get(/^\/cached\//, function (req, res, next) {
+  locallyCachedResources.sendFromCache(req, res, next);
+})
 
-
+// RESTful object: wiki markdown
+router.get(/^\/pages\/wikipages\//, function (req, res, next) {
+  var wikipage = {
+    name: "home",
+    sourceFormat: "md",
+    content: "# Home\n## This is Markdown!"
+  };
+  console.log(wikipage);
+  console.log(JSON.stringify(wikipage));
+  res.send(JSON.stringify(wikipage));
+})
 
 app.use("/", router);
 

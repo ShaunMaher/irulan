@@ -22,7 +22,7 @@ angular.module('components', [])
   .directive('inject', function() {
     return {
       link: function($scope, $element, $attrs, controller, $transclude) {
-        console.log('inject!');
+        console.log('navbar item inject!');
         if (!$transclude) {
           throw minErr('ngTransclude')('orphan',
             'Illegal use of ngTransclude directive in the template! ' +
