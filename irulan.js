@@ -9,6 +9,7 @@ var clientJsDir = __dirname + '/client_js/';
 var clientCssDir = __dirname + '/client_css/';
 var cachedJsDir = clientJsDir + '/cached/';
 var cachedCssDir = clientCssDir + '/cached/';
+var wikiContentDir = __dirname + '/content/wikipages/'
 
 router.use(function (req, res, next) {
   console.log("/" + req.method);
@@ -40,16 +41,29 @@ router.get(/^\/cached\//, function (req, res, next) {
 })
 
 // RESTful object: wiki markdown
+var wikipages = require("wikipages");
+wikipages(wikiContentDir);
 router.get(/^\/pages\/wikipages\//, function (req, res, next) {
-  var wikipage = {
-    name: "home",
-    sourceFormat: "md",
-    content: "# Home\n## This is Markdown!"
-  };
-  console.log(wikipage);
-  console.log(JSON.stringify(wikipage));
-  res.send(JSON.stringify(wikipage));
+  wikipages.get(req, res, next);
 })
+
+// URL to a specific wiki page - we just send the index.html page and let it
+//  load the right content
+router.get(/^\/wiki\//, function (req, res, next) {
+  res.sendFile(viewsDir + "index.html");
+});
+
+// RESTful object: wiki markdown
+//router.get(/^\/pages\/wikipages\//, function (req, res, next) {
+//  var wikipage = {
+//    name: "home",
+//    sourceFormat: "md",
+//    content: "# Home\n## This is Markdown!"
+//  };
+//  console.log(wikipage);
+//  console.log(JSON.stringify(wikipage));
+//  res.send(JSON.stringify(wikipage));
+//})
 
 app.use("/", router);
 
