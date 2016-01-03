@@ -24,6 +24,7 @@ app.Settings['index page module name'] = 'irulan-single-page-application';
 app.Settings['http listening port'] = 3000;
 app.Settings['load plugins'] = Array("wikipage");
 
+// Runtime objects
 app.ClientScripts = {};
 app.ClientScripts['single page application'] = Array();
 app.ClientCss = {};
@@ -45,11 +46,17 @@ router.get("/components.navbar.js", function (req, res) {
 router.get("/components.pages.js", function (req, res) {
   res.sendFile(app.Settings['clientJsDir'] + "components.pages.js");
 });
+router.get("/components.wikipages.js", function (req, res) {
+  res.sendFile(app.Settings['clientJsDir'] + "components.wikipages.js");
+});
 router.get("/marked.min.js", function (req, res) {
   res.sendFile(__dirname + '/node_modules/marked/marked.min.js');
 });
 router.get("/app.js", function (req, res) {
   res.sendFile(app.Settings['clientJsDir'] + "app.js");
+});
+router.get("/irulan_client.js", function (req, res) {
+  res.sendFile(app.Settings['node modules directory'] + '/' + app.Settings['index page module name'] + "/irulan_client.js");
 });
 
 // Locally cached resources

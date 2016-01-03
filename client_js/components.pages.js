@@ -67,7 +67,6 @@ irulan.directive('warning', function() {
   }
 })
 
-
 // Empty template for a "Page" object
 irulan.factory('Page', function() {
   function Page() {
@@ -84,59 +83,52 @@ irulan.factory('Page', function() {
   return (Page);
 })
 
+// An array of Page Namespaces and the factories that can create them.  Not yet finished.
+irulan.value('PageNamespaceProviders', Array());
+
+irulan.service('Pages', ['Page', 'PageNamespaceProviders', '$resource', function(Page, PageNamespaceProviders, $resource){
+  //this.Page = Page
+  this.pages = {};
+
+  console.log("Pages: PageNamespaceProviders: " + JSON.stringify(PageNamespaceProviders));
+
+  this.get = function(options, callback) {
+    for (index in PageNamespaceProviders) {
+      PageNamespaceProvider = PageNamespaceProviders[index];
+      //console.log(PageNamespaceProvider);
+      if (options.name.substring(0, PageNamespaceProvider.namespace.length) == PageNamespaceProvider.namespace) {
+        //console.log(PageNamespaceProvider.namespace + ' can handle the request for ' + options.name);
+        var newPage = PageNamespaceProviders[0].factory;
+        return newPage.get(options, callback)
+      }
+    }
+    //TODO: work out what will happen if this happens
+    return false;
+  }
+  this.new = function() {
+    return new Page;
+  }
+}])
+
 // This filter takes a "page" object and runs it through the appropraite
 //  functions to convert it from Markdown/Wiki Syntax, etc to HTML
-irulan.filter('pageRenderer', function() {
+irulan.filter('pageRenderer', ['$filter', 'SourceRenderers', function($filter, SourceRenderers) {
   return function(page) {
     if (page.sourceFormat) {
       if (page.sourceFormat == null) {
         return page.content
       }
-      else if (page.sourceFormat == "md") {
-        var renderer = new marked.Renderer();
-        var lexer = new marked.Lexer({});
-        //console.log(lexer.rules);
-        //console.log(renderer)
-        renderer.link = function(href, title, text) {
-          if (title == null) {
-            title = page.name;
-          }
-          if (/:\/\//.test(href)) {
-            console.log("absolute uri: " + href);
-          }
-          else if (/^\/\//.test(href)) {
-            console.log("absolute uri (relative protocol): " + href);
-          }
-          else if (/^\//.test(href)) {
-            console.log("relative uri (to site base): " + href);
-          }
-          else {
-            console.log("relative uri: " + href);
-            var base = page.name.split("/", 2)[0];
-            //var relativeName = page.name.split(":", 2)[1];
-            href = "/" + base + "/" + href
-            console.log(href);
-          }
-          return '<a href="'+ href + '" title="' + title + '">' + text + '</a>';
-        }
-        var context = [];
-        context.titleExtracted = false;
-        context.page = page;
-        renderer.heading = (function(string, level) {
-          if ((level < 3) && (!context.titleExtracted)) {
-            context.page.title = string;
-            context.titleExtracted = true;
-            return "";
-          }
-          else {
-            level = level + 2;
-            return '<h' + level + '>' + string + '</h' + level + '>';
-          }
-        }).bind(context);
 
-        page.renderedHtml = marked(page.content, {renderer: renderer});
+      var rendered = false;
+      for (index in SourceRenderers) {
+        SourceRenderer = SourceRenderers[index];
+        if (SourceRenderer.sourceFormat == page.sourceFormat) {
+          console.log('Using ' + SourceRenderer.name);
+          page.renderedHtml = $filter(SourceRenderer.name)(page);
+          rendered = true;
+        }
       }
-      else {
+      if (!rendered) {
         page.renderedHtml = "I don't know how to render this page: " + JSON.stringify(page);
       }
 
@@ -165,4 +157,4 @@ irulan.filter('pageRenderer', function() {
       return page
     }
   }
-})
+}])
