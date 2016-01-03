@@ -7,23 +7,28 @@ var router = express.Router();
 
 // Default settings
 //TODO: Load these from json file
-var global_settings = {};
-global_settings['views directory'] = __dirname + '/views/';
-global_settings['node modules directory'] = __dirname + 'node_modules';
-global_settings['offline mode'] = true;
-global_settings['clientCssDir'] = __dirname + '/client_css/';
-global_settings['clientJsDir'] = __dirname + '/client_js/';
-global_settings['cachedJsDir'] = global_settings['clientJsDir'] + '/cached/';
-global_settings['cachedCssDir'] = global_settings['clientCssDir'] + '/cached/';
-global_settings['wiki content directory'] = __dirname + '/content/wikipages/';
-global_settings['client scripts'] = {};
-global_settings['client scripts']['single page application'] = Array();
-global_settings['client css'] = {};
-global_settings['client css']['single page application'] = Array();
-global_settings['index page module name'] = 'irulan-single-page-application';
-global_settings['http listening port'] = 3000;
-global_settings['load plugins'] = Array("wikipage");
-global_settings['loaded plugins'] = {};
+app.Settings = {};
+app.Settings['views directory'] = __dirname + '/views/';
+app.Settings['node modules directory'] = __dirname + '/node_modules/';
+app.Settings['offline mode'] = true;
+app.Settings['clientCssDir'] = __dirname + '/client_css/';
+app.Settings['clientJsDir'] = __dirname + '/client_js/';
+app.Settings['cachedJsDir'] = app.Settings['clientJsDir'] + '/cached/';
+app.Settings['cachedCssDir'] = app.Settings['clientCssDir'] + '/cached/';
+app.Settings['wiki content directory'] = __dirname + '/content/wikipages/';
+app.Settings['client scripts'] = {};
+app.Settings['client scripts']['single page application'] = Array();
+app.Settings['client css'] = {};
+app.Settings['client css']['single page application'] = Array();
+app.Settings['index page module name'] = 'irulan-single-page-application';
+app.Settings['http listening port'] = 3000;
+app.Settings['load plugins'] = Array("wikipage");
+
+app.ClientScripts = {};
+app.ClientScripts['single page application'] = Array();
+app.ClientCss = {};
+app.ClientCss['single page application'] = Array();
+app.LoadedPlugins = {};
 
 router.use(function (req, res, next) {
   console.log("/" + req.method);
@@ -31,47 +36,47 @@ router.use(function (req, res, next) {
 });
 
 // The default index.html provider (also provides error pages)
-var indexpageapplication = require(global_settings['index page module name']);
-indexpageapplication(global_settings, router);
+app.IndexPageApplication = require(app.Settings['index page module name']);
+app.IndexPageApplication(app, router);
 
 router.get("/components.navbar.js", function (req, res) {
-  res.sendFile(global_settings['clientJsDir'] + "components.navbar.js");
+  res.sendFile(app.Settings['clientJsDir'] + "components.navbar.js");
 });
 router.get("/components.pages.js", function (req, res) {
-  res.sendFile(global_settings['clientJsDir'] + "components.pages.js");
+  res.sendFile(app.Settings['clientJsDir'] + "components.pages.js");
 });
 router.get("/marked.min.js", function (req, res) {
   res.sendFile(__dirname + '/node_modules/marked/marked.min.js');
 });
 router.get("/app.js", function (req, res) {
-  res.sendFile(global_settings['clientJsDir'] + "app.js");
+  res.sendFile(app.Settings['clientJsDir'] + "app.js");
 });
 
 // Locally cached resources
 var locallyCachedResources = require("locallyCachedResources");
-locallyCachedResources(global_settings['cachedJsDir'], global_settings['cachedCssDir']);
+locallyCachedResources(app.Settings['cachedJsDir'], app.Settings['cachedCssDir']);
 router.get(/^\/cached\//, function (req, res, next) {
   locallyCachedResources.sendFromCache(req, res, next);
 })
 
 // Dynamic loading of selected plugins
-for (index in global_settings['load plugins']) {
+for (index in app.Settings['load plugins']) {
   //TODO
 }
 
 // RESTful object: wiki markdown (replace with dynamic loading above)
 var wikipages = require("wikipages");
-wikipages(global_settings, router);
+wikipages(app, router);
 
-console.log(global_settings);
-console.log(global_settings['client scripts']['single page application']);
-console.log(indexpageapplication.InjectClientScripts());
+console.log(app.Settings);
+console.log(app.Settings['client scripts']['single page application']);
+console.log(app.IndexPageApplication.InjectClientScripts());
 
 // URL to a specific wiki page - we just send the index.html page and let it
 //  load the right content
 //TODO: Move to wikipage module
 router.get(/^\/wiki\//, function (req, res, next) {
-  indexpageapplication.IndexPage(req, res);
+  app.IndexPageApplication.IndexPage(req, res);
 });
 
 app.use("/", router);
@@ -79,9 +84,9 @@ app.use("/", router);
 // When all other request handlers have had a chance to pick up the request and
 //  haven't done so, it's time for a 404 error.
 app.use("*", function(req, res) {
-  indexpageapplication.ErrorPage(req, res, 404, "Page not found");
+  app.IndexPageApplication.ErrorPage(req, res, 404, "Page not found");
 });
 
-app.listen(global_settings['http listening port'], function() {
-  console.log("Listening on port " + global_settings['http listening port']);
+app.listen(app.Settings['http listening port'], function() {
+  console.log("Listening on port " + app.Settings['http listening port']);
 });

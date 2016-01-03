@@ -108,26 +108,4 @@ var irulan = angular.module('irulan', ['components', 'ngResource', 'ngSanitize',
         });
       }
     });
-
-    //var context = {};
-    //context.pagename = 'wikipage:home';
-
-    //$scope.$watch(
-    //  function() {
-    //    return JSON.stringify($scope.pages['wikipage:home']);
-    //  },
-    //  (function() {
-    //    console.log("value changed: " + context.pagename);
-    //    pageElements = angular.element(document).find("page");
-    //    console.log(pageElements);
-    //    for (var index=0;index<pageElements.length;index++) {
-    //      page = pageElements[index];
-    //      if (page.attributes['ng-pagename'].value == context.pagename) {
-    //        console.log('need to update...');
-    //        console.log(JSON.stringify(page));
-    //        page.outerHTML('<page ng-pagename="' + context.pagename + '"></page>');
-    //      }
-    //    }
-    //  }).bind(context)
-    //)
   }]);
