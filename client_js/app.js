@@ -1,4 +1,4 @@
-var irulan = angular.module('irulan', ['components', 'ngResource', 'ngSanitize'])
+var irulan = angular.module('irulan', ['components', 'ngResource', 'ngSanitize', 'ngRoute'])
   .filter('unsafe', ['$sce', function($sce) {
     return function(htmlCode) {
       console.log('is this called?');
@@ -10,16 +10,20 @@ var irulan = angular.module('irulan', ['components', 'ngResource', 'ngSanitize']
     $locationProvider.html5Mode(true).hashPrefix('!');
   })
   .factory('WikiPage', ['Page', function(Page) {
-    var wikipage = new Page;
-    wikipage.name = '';
-    wikipage.sourceFormat = 'txt';
-    wikipage.returnedJson = '';
-    wikipage.content = '';
-    return wikipage;
+    function WikiPage() {
+      //What here?
+    }
+    //var wikipage = new Page;
+    //wikipage.name = '';
+    //wikipage.sourceFormat = 'txt';
+    //wikipage.returnedJson = '';
+    //wikipage.content = '';
+    return WikiPage;
   }])
   .service('Pages', ['Page', 'WikiPages', '$resource', function(Page, WikiPages, $resource){
     this.WikiPages = WikiPages
-    this.Page = Page
+    //this.Page = Page
+    this.pages = {};
 
     this.get = function(options, callback) {
       return this.WikiPages.get(options, callback)
@@ -30,19 +34,34 @@ var irulan = angular.module('irulan', ['components', 'ngResource', 'ngSanitize']
   }])
   .service('WikiPages', ['WikiPage', '$resource', function(WikiPage, $resource) {
     this.wikipages = [];
-    this.resource = $resource('/pages/wikipages/:name');
+    this.resource = $resource('/pages/wiki/:name');
+
     this.get = function(options, callback) {
       console.log(options)
+
+      // We need this information to be available to the callback function so we
+      //  create a "context" object which will become the "this" object within
+      //  the callback function.
       var context = [];
       context.options = options;
-      context.thisWikiPage = WikiPage;
+      console.log("what comes next should be an empty page object:")
+      context.thisWikiPage = new WikiPage;
+      console.log(context.thisWikiPage);
+      context.thisWikiPage.name = options.name
       console.log(context.thisWikiPage);
       context.callback = callback;
       context.wikipages = this.wikipages;
+
+      // We need to remove the "wiki:" from the start of the requested page
+      //  name.
+      options.name = options.name.replace(/^wiki\//i, "");
+      console.log("will request: " + options.name);
+
+      // Make the http call
       this.resource.get(options, (function(value) {
         console.log(value);
         thisWikiPage = this.thisWikiPage;
-        thisWikiPage.name = this.options.name;
+        //thisWikiPage.name = this.options.name;
         thisWikiPage.content = value.content;
         thisWikiPage.sourceFormat = value.sourceFormat;
         thisWikiPage.returnedJson = value;
@@ -57,17 +76,38 @@ var irulan = angular.module('irulan', ['components', 'ngResource', 'ngSanitize']
   .controller('IrulanController', ['$scope', '$location', 'Pages', function($scope, $location, Pages) {
     console.log($scope);
 
-    $scope.pages = {};
+    //TODO: Move this to a .config? item
+    $scope.homePage = 'wiki/home';
+
+    $scope.pages = Pages.pages;
 
     console.log($location.path());
 
-    var newpage = Pages.new();
-    $scope.pages['start'] = newpage;
+    //var newpage = Pages.new();
+    //$scope.pages['start'] = newpage;
 
-    $scope.pages['wikipage:home'] = Pages.get({ name: 'home' }, function(page) {
-      console.log(page);
-      //$scope.pages['wikipage:home'] = page;
-    })
+    //$scope.pages['wiki/home'] = Pages.get({ name: 'wiki/home' }, function(page) {
+    //  console.log(page);
+    //  //$scope.pages['wikipage:home'] = page;
+    //})
+
+    $scope.$on('$locationChangeStart', function(event, next, current) {
+      //console.log(event);
+      //console.log($location.path());
+      console.log(Pages.pages);
+      var newpage = $location.path();
+      newpage = newpage.replace(/^\//, "");
+      if (newpage.length < 1) {
+        newpage = $scope.homePage;
+      }
+
+      if(!(newpage in Pages.pages)) {
+        console.log("Load page not previously loaded: " + newpage);
+        Pages.pages[newpage] = Pages.get({ name: newpage }, function(page) {
+          console.log(Pages.pages);
+        });
+      }
+    });
 
     //var context = {};
     //context.pagename = 'wikipage:home';

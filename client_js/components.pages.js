@@ -4,7 +4,7 @@ irulan.directive('pages', function() {
     restrict: 'E',
     transclude: true,
     template:
-      '<div style="margin-left: 2em; margin-right: 2em;" class="panel panel-default" ng-repeat="(name, page) in pages">'+
+      '<div ng-repeat="(name, page) in pages">'+
       '<page ng-pagename="{{name}}">{{name}}</page>'+
       '<ng-transclude></ng-transclude>'+
       '</div>',
@@ -55,6 +55,19 @@ irulan.directive('page', ['$filter', function($filter) {
   }
 }])
 
+irulan.directive('warning', function() {
+  console.log("warning directive")
+  return {
+    restrict: 'E',
+    transclude: true,
+    template:
+      '<div class="alert alert-warning">'+
+      '<ng-transclude></ng-transclude>'+
+      '</div>',
+  }
+})
+
+
 // Empty template for a "Page" object
 irulan.factory('Page', function() {
   function Page() {
@@ -82,11 +95,30 @@ irulan.filter('pageRenderer', function() {
       else if (page.sourceFormat == "md") {
         var renderer = new marked.Renderer();
         var lexer = new marked.Lexer({});
-        console.log(lexer.rules);
+        //console.log(lexer.rules);
         //console.log(renderer)
-        //renderer.link = function(href, title, text) {
-        //  return '<a href="'+ href + '" title="' + title + '">' + text + 'Ive tampered</a>';
-        //}
+        renderer.link = function(href, title, text) {
+          if (title == null) {
+            title = page.name;
+          }
+          if (/:\/\//.test(href)) {
+            console.log("absolute uri: " + href);
+          }
+          else if (/^\/\//.test(href)) {
+            console.log("absolute uri (relative protocol): " + href);
+          }
+          else if (/^\//.test(href)) {
+            console.log("relative uri (to site base): " + href);
+          }
+          else {
+            console.log("relative uri: " + href);
+            var base = page.name.split("/", 2)[0];
+            //var relativeName = page.name.split(":", 2)[1];
+            href = "/" + base + "/" + href
+            console.log(href);
+          }
+          return '<a href="'+ href + '" title="' + title + '">' + text + '</a>';
+        }
         var context = [];
         context.titleExtracted = false;
         context.page = page;
@@ -108,10 +140,24 @@ irulan.filter('pageRenderer', function() {
         page.renderedHtml = "I don't know how to render this page: " + JSON.stringify(page);
       }
 
-      if (page.title != null) {
-        html = '<div class="panel-heading"><h3 class="panel-title">' + page.title + '</h3></div>';
-      }
-      html = html + '<div class="panel-body">' + page.renderedHtml + '</div>';
+      var html = '<div style="margin-left: 2em; margin-right: 2em;" class="panel panel-primary">';
+      //if (page.title != null) {
+      html = html + '<div class="panel-heading">' +
+        '<h3 class="panel-title">' +
+        page.title +
+        '<span style="float: right; margin-top: -0.3em;">' +
+          '<button type="button" class="close" style="padding-left: 0.4em; font-size: 150%; color: white;" data-dismiss="modal" aria-hidden="true">&#x2715;</button>' +
+          '<button type="button" class="close" style="padding-left: 0.4em; font-size: 150%; color: white;" data-dismiss="modal" aria-hidden="true">&#x23bd;</button>' +
+        '</span>' +
+        '</h3></div>';
+      //}
+      html = html + '<div class="panel-footer"> test' +
+      '<span style="float: right; margin-top: -0.3em;">' +
+        '<button type="button" class="close" style="padding-left: 0.4em; font-size: 150%;" data-dismiss="modal" aria-hidden="true">&#x21BB;</button>' +
+        '<button type="button" class="close" style="padding-left: 0.4em; font-size: 190%;" data-dismiss="modal" aria-hidden="true">&#xE207;</button>' +
+      '</span>' +
+      '</div>' +
+      '<div class="panel-body">' + page.renderedHtml + '</div></div>';
       return html;
     }
     else {

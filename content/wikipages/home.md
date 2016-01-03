@@ -12,6 +12,8 @@ this will be a code block
 this.will(be, javascript).highlighted();
 ```
 
+<warning>warning text</warning>
+
 Some text examples of
 *  **bold**
 *  *italics*
