@@ -76,7 +76,7 @@ angular.module('components', [])
         '      <a class="navbar-brand" href="#">{{title}}</a>' +
         '    </div>' +
         '    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" ng-controller="ctrl">' +
-        '        <ul class="nav navbar-nav">' +
+        '      <ul class="nav navbar-nav">' +
         '        <li ng-repeat="navitem in navitems" inject="{{$index}}"></li>' +
         '        <li class="dropdown">' +
         '          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>' +
@@ -92,15 +92,30 @@ angular.module('components', [])
         '        </li>' +
         '      </ul>' +
         '      <div style="display: none" ng-transclude></div>' +
-        '      <form class="navbar-form navbar-left" role="search">' +
-        '        <div class="form-group">' +
-        '          <input type="text" class="form-control" placeholder="Search">' +
-        '        </div>' +
-        '        <button type="submit" class="btn btn-default">Submit</button>' +
-        '      </form>' +
-        '      <ul class="nav navbar-nav navbar-right">' +
-        '        <li><a href="#">Link</a></li>' +
-        '      </ul>' +
+        //'      <ul class="nav nav-tabs" style="border-style: solid; border-width: 1px; border-color: #FFFF00; display: inline-block;">' +
+        //'        <li class="active"><a style="padding-top: 20.5px;" href="#home" data-toggle="tab" aria-expanded="true">Home</a></li>' +
+        //'        <li class=""><a href="#profile" data-toggle="tab" aria-expanded="false">Profile</a></li>' +
+        //'        <li class="disabled"><a>Disabled</a></li>' +
+        //'        <li class="dropdown">' +
+        //'          <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">' +
+        //'            Dropdown <span class="caret"></span>' +
+        //'          </a>' +
+        //'          <ul class="dropdown-menu">' +
+        //'            <li><a href="#dropdown1" data-toggle="tab">Action</a></li>' +
+        //'            <li class="divider"></li>' +
+        //'            <li><a href="#dropdown2" data-toggle="tab">Another action</a></li>' +
+        //'          </ul>' +
+        //'        </li>' +
+        //'        </ul>' +
+        //'      <form class="navbar-form navbar-left" role="search" style="border-style: solid; border-width: 1px; border-color: #FFFF00;">' +
+        //'        <div class="form-group" style="border-style: solid; border-width: 1px; border-color: #FFFF00;">' +
+        //'          <input type="text" class="form-control" placeholder="Search">' +
+        //'        </div>' +
+        //'        <button type="submit" class="btn btn-default">Submit</button>' +
+        //'      </form>' +
+        //'      <ul class="nav navbar-nav navbar-right">' +
+        //'        <li><a href="#">Link</a></li>' +
+        //'      </ul>' +
         '    </div>' +
         '  </div>' +
         '</nav>',
