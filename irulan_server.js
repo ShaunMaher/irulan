@@ -20,7 +20,7 @@ app.Settings['client scripts'] = {};
 app.Settings['client scripts']['single page application'] = Array();
 app.Settings['client css'] = {};
 app.Settings['client css']['single page application'] = Array();
-app.Settings['index page module name'] = 'irulan-single-page-application';
+app.Settings['index page module name'] = 'irulanclient';
 app.Settings['http listening port'] = 3000;
 app.Settings['load plugins'] = Array("irulanwiki");
 

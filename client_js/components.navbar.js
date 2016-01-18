@@ -1,4 +1,4 @@
-angular.module('components', [])
+var navbar = angular.module('components', [])
   // The way that items are added to the "navbar" is a little complicated.  You
   //  can't ng-transclude on the same element that you're doing a ng-repeat= on.
   //  I'm not entirely sure I understand why to be honest.  It's got to do with
@@ -73,7 +73,7 @@ angular.module('components', [])
         '        <span class="icon-bar"></span>' +
         '        <span class="icon-bar"></span>' +
         '      </button>' +
-        '      <a class="navbar-brand" href="#">{{title}}</a>' +
+        "      <a href=\"#\" class=\"navbar-brand\" onclick=\"console.log(irulan); irulan.show_launcher();\">{{title}}</a>" +
         '    </div>' +
         '    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1" ng-controller="ctrl">' +
         '      <ul class="nav navbar-nav">' +
