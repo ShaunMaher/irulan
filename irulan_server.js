@@ -1,3 +1,4 @@
+"use strict"
 var express = require("express");
 var fs = require("fs");
 //var url = require("url");
@@ -7,22 +8,56 @@ var url = require("url");
 var app = express();
 var router = express.Router();
 
+var localStorage = require("modular-localstorage");
+//var TestLocalStorage = new testLocalStorage();
+
+app.localStorage = localStorage;
+
 // Default settings
-//TODO: Load these from json file
+let defaultSettings = {
+  'views directory': __dirname + '/views/',
+  'node modules directory': __dirname + '/node_modules/',
+  'offline mode': true,
+  'cachedJsDir': __dirname + '/cache/js/',
+  'cachedCssDir': __dirname + '/cache/css/',
+  'wiki content directory': __dirname + '/content/wikipages/',
+  'index page module name': 'irulanclient',
+  'http listening port': 3000,
+  'load plugins': [
+    'irulanwiki',
+    'irulankeepass',
+    'irulansysinfo',
+    'irulanlxd'
+  ]
+}
+
+// Build the
 app.Settings = {};
-app.Settings['views directory'] = __dirname + '/views/';
-app.Settings['node modules directory'] = __dirname + '/node_modules/';
-app.Settings['offline mode'] = true;
-app.Settings['cachedJsDir'] = __dirname + '/cache/js/';
-app.Settings['cachedCssDir'] = __dirname + '/cache/css/';
-app.Settings['wiki content directory'] = __dirname + '/content/wikipages/';
-app.Settings['client scripts'] = {};
-app.Settings['client scripts']['single page application'] = Array();
-app.Settings['client css'] = {};
-app.Settings['client css']['single page application'] = Array();
-app.Settings['index page module name'] = 'irulanclient';
-app.Settings['http listening port'] = 3000;
-app.Settings['load plugins'] = Array("irulanwiki", "irulankeepass", "irulansysinfo");
+for (let index in defaultSettings) {
+  app.Settings[index] = localStorage.getItem(index, defaultSettings[index]);
+}
+
+// Shutdown handler.
+function graceful_shutdown(options, err) {
+  console.log("Shutting down.");
+  for (let index in app.LoadedPlugins) {
+    //console.log("Shutting down ", app.LoadedPlugins[index]);
+    if (app.LoadedPlugins[index].graceful_shutdown) {
+      app.LoadedPlugins[index].graceful_shutdown();
+    }
+  }
+  // Save settings to disk.
+  for (let index in app.Settings) {
+    if (app.Settings[index] != defaultSettings[index]) {
+      localStorage.setItem(index, app.Settings[index]);
+    }
+  }
+  if (err) console.log(err.stack);
+  if (options.exit) process.exit();
+}
+process.on('exit', graceful_shutdown.bind(null,{}));
+process.on('SIGINT', graceful_shutdown.bind(null, {exit:true}));
+process.on('uncaughtException', graceful_shutdown.bind(null, {exit:true}));
 
 // Runtime objects
 app.ClientScripts = {};
@@ -46,12 +81,13 @@ for (index in app.Settings['load plugins']) {
   console.log("Loading plugin: " + pluginName);
   try {
     var newPlugin = require(pluginName);
-    newPlugin(app, router);
-    app.LoadedPlugins[pluginName] = newPlugin;
+    var newObject = new newPlugin(app, router);
+    app.LoadedPlugins[pluginName] = newObject;
   }
   catch(err) {
     console.log("Failed to load plugin: " + pluginName);
     console.log(err);
+    console.log(err.stack);
   }
 }
 
@@ -115,7 +151,7 @@ for (var index in app.ClientScripts['single page application']) {
 }
 
 console.log(app.Settings);
-console.log(app.Settings['client scripts']['single page application']);
+console.log(app.ClientScripts['single page application']);
 console.log(app.IndexPageApplication.InjectClientScripts());
 console.log(app.IndexPageApplication.InjectClientCSS());
 
@@ -137,3 +173,5 @@ app.use("*", function(req, res) {
 app.listen(app.Settings['http listening port'], function() {
   console.log("Listening on port " + app.Settings['http listening port']);
 });
+
+//process.exit();
