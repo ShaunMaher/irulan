@@ -57,7 +57,7 @@ function graceful_shutdown(options, err) {
 }
 process.on('exit', graceful_shutdown.bind(null,{}));
 process.on('SIGINT', graceful_shutdown.bind(null, {exit:true}));
-process.on('uncaughtException', graceful_shutdown.bind(null, {exit:true}));
+//process.on('uncaughtException', graceful_shutdown.bind(null, {exit:true}));
 
 // Runtime objects
 app.ClientScripts = {};
